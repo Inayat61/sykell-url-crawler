@@ -2,6 +2,37 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+---
+
+## Project Overview
+
+This is the React TypeScript frontend application for the Sykell URL Crawler project. It provides a user interface to interact with the Go backend API, allowing users to submit URLs for analysis, view crawl results, and inspect detailed page information.
+
+### Technologies Used
+
+* **React:** For building the user interface.
+* **TypeScript:** For type safety and better code maintainability.
+* **Material-UI (MUI):** A comprehensive React UI library for beautiful and consistent components.
+* **Recharts:** A charting library used to visualize link distribution on the URL details page.
+* **React Router DOM:** For client-side routing within the application.
+
+### Important Dependencies
+
+This frontend application relies heavily on the **Go Backend API** being up and running. Ensure you have started the backend server (typically on `http://localhost:8080`) before running this frontend.
+
+### Frontend Usage
+
+1.  **Ensure Backend is Running:** The backend Go API needs to be accessible at `http://localhost:8080`.
+2.  **Install Dependencies:** Navigate to this `frontend` directory in your terminal and run `npm install`.
+3.  **Start the Development Server:** Use `npm start` (as described below).
+4.  **Interact with the UI:**
+    * Enter a URL in the input field on the dashboard.
+    * Click "Add URL".
+    * Select a URL from the table and click "Crawl" to initiate the analysis.
+    * Click "Details" to view comprehensive information, including heading counts, link distribution charts, and inaccessible links.
+
+---
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -41,6 +72,6 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 
 ## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+You can learn more in the [Create React App documentation](https://facebook.com/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+To learn React, check out the [React documentation](https://react.dev/).
