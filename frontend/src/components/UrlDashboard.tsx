@@ -1,26 +1,13 @@
 // frontend/src/components/UrlDashboard.tsx
 import React, { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom'; // <--- IMPORT useNavigate
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  CircularProgress,
-  Box,
-  Button,
-  Alert,
-  Chip,
-} from '@mui/material';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import InfoIcon from '@mui/icons-material/Info';
+import { useNavigate } from 'react-router-dom';
+import { CircularProgress, Box, Alert, Typography } from '@mui/material';
 
-import { URLAnalysis, AnalysisStatus } from '../types';
+// Import new sub-components
+import UrlDashboardHeader from './dashboard/UrlDashboardHeader';
+import UrlAnalysisTable from './dashboard/UrlAnalysisTable';
+
+import { URLAnalysis } from '../types'; // Adjust path if needed
 
 interface UrlDashboardProps {
   refreshTrigger: number;
@@ -29,7 +16,7 @@ interface UrlDashboardProps {
 const API_BASE_URL = 'http://localhost:8080/api';
 
 const UrlDashboard: React.FC<UrlDashboardProps> = ({ refreshTrigger }) => {
-  const navigate = useNavigate(); // <--- INITIALIZE useNavigate
+  const navigate = useNavigate();
   const [urls, setUrls] = useState<URLAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -82,29 +69,8 @@ const UrlDashboard: React.FC<UrlDashboardProps> = ({ refreshTrigger }) => {
     }
   };
 
-  // --- NEW FUNCTION TO HANDLE NAVIGATION TO DETAILS ---
   const handleViewDetails = (id: number) => {
     navigate(`/urls/${id}`);
-  };
-  // --- END NEW FUNCTION ---
-
-  const getStatusChipColor = (status: AnalysisStatus) => {
-    switch (status) {
-      case 'queued': return 'default';
-      case 'running': return 'info';
-      case 'done': return 'success';
-      case 'error': return 'error';
-      default: return 'default';
-    }
-  };
-
-  const formatDate = (isoString: string) => {
-    if (!isoString) return 'N/A';
-    try {
-      return new Date(isoString).toLocaleString();
-    } catch {
-      return 'Invalid Date';
-    }
   };
 
   if (loading) {
@@ -125,88 +91,15 @@ const UrlDashboard: React.FC<UrlDashboardProps> = ({ refreshTrigger }) => {
   }
 
   return (
-    <TableContainer component={Paper} sx={{ mt: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
-        <Typography variant="h5" component="h2">
-          Analysis Results
-        </Typography>
-        <Button
-          variant="outlined"
-          onClick={fetchUrls}
-          startIcon={<RefreshIcon />}
-          disabled={loading}
-        >
-          Refresh
-        </Button>
-      </Box>
-      <Table sx={{ minWidth: 650 }} aria-label="URL analysis table">
-        <TableHead>
-          <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>URL</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Title</TableCell>
-            <TableCell>HTML Version</TableCell>
-            <TableCell>H1/H2 Counts</TableCell>
-            <TableCell>Links (Int/Ext)</TableCell>
-            <TableCell>Login Form</TableCell>
-            <TableCell>Updated At</TableCell>
-            <TableCell align="right">Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {urls.map((urlAnalysis) => (
-            <TableRow key={urlAnalysis.id}>
-              <TableCell>{urlAnalysis.id}</TableCell>
-              <TableCell>
-                <a href={urlAnalysis.url} target="_blank" rel="noopener noreferrer">
-                  {urlAnalysis.url}
-                </a>
-              </TableCell>
-              <TableCell>
-                <Chip
-                  label={urlAnalysis.status.charAt(0).toUpperCase() + urlAnalysis.status.slice(1)}
-                  color={getStatusChipColor(urlAnalysis.status)}
-                  size="small"
-                />
-              </TableCell>
-              <TableCell>{urlAnalysis.page_title || 'N/A'}</TableCell>
-              <TableCell>{urlAnalysis.html_version || 'N/A'}</TableCell>
-              <TableCell>
-                H1: {urlAnalysis.heading_counts.h1} <br />
-                H2: {urlAnalysis.heading_counts.h2}
-              </TableCell>
-              <TableCell>
-                Int: {urlAnalysis.internal_links} <br />
-                Ext: {urlAnalysis.external_links}
-              </TableCell>
-              <TableCell>{urlAnalysis.has_login_form ? 'Yes' : 'No'}</TableCell>
-              <TableCell>{formatDate(urlAnalysis.updated_at)}</TableCell>
-              <TableCell align="right">
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<PlayArrowIcon />}
-                  onClick={() => handleTriggerCrawl(urlAnalysis.id)}
-                  disabled={urlAnalysis.status === 'running' || triggeringCrawlId === urlAnalysis.id}
-                  sx={{ mr: 1 }}
-                >
-                  {urlAnalysis.status === 'running' ? 'Running...' : 'Crawl'}
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<InfoIcon />}
-                  onClick={() => handleViewDetails(urlAnalysis.id)} 
-                >
-                  Details
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <>
+      <UrlDashboardHeader onRefresh={fetchUrls} loading={loading} />
+      <UrlAnalysisTable
+        urls={urls}
+        onTriggerCrawl={handleTriggerCrawl}
+        onViewDetails={handleViewDetails}
+        triggeringCrawlId={triggeringCrawlId}
+      />
+    </>
   );
 };
 

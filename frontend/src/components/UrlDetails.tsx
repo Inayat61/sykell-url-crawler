@@ -5,10 +5,9 @@ import {
   Container,
   Typography,
   CircularProgress,
-  Box, // Using Box for layout as per your code
+  Box,
   Alert,
   Paper,
-  // Grid, // Grid is not used in your current layout for individual items
   Chip,
   List,
   ListItem,
@@ -154,12 +153,11 @@ const UrlDetails: React.FC = () => {
     );
   };
 
-  // Data for the Pie Chart
   const linkChartData = [
     { name: 'Internal Links', value: urlAnalysis.internal_links },
     { name: 'External Links', value: urlAnalysis.external_links },
   ];
-  const COLORS = ['#0088FE', '#FFBB28']; // Colors for the pie chart slices
+  const COLORS = ['#0088FE', '#FFBB28'];
 
   return (
     <Container maxWidth="md">
@@ -173,12 +171,18 @@ const UrlDetails: React.FC = () => {
       </Button>
 
       <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
-        <Typography variant="h5" component="h2" gutterBottom>
+        <Typography
+          variant="h5" // Default for larger screens
+          component="h2"
+          gutterBottom
+          sx={{
+            fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2.125rem' } // Responsive font size
+          }}
+        >
           Details for URL: <a href={urlAnalysis.url} target="_blank" rel="noopener noreferrer" style={{ wordBreak: 'break-all' }}>{urlAnalysis.url}</a>
         </Typography>
         <Divider sx={{ my: 2 }} />
 
-        {/* This is your existing Box-based grid layout */}
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
           <Box>
             <Typography variant="subtitle1" color="text.secondary">ID:</Typography>
@@ -221,13 +225,11 @@ const UrlDetails: React.FC = () => {
           </Box>
         </Box>
 
-        {/* Existing: Heading Counts */}
         <Box sx={{ mt: 3 }}>
           <Typography variant="h6" sx={{ mb: 1 }}>Heading Counts:</Typography>
           {renderHeadingCounts(urlAnalysis.heading_counts)}
         </Box>
 
-        {/* New: Link Distribution Chart within its own Box */}
         <Box sx={{ mt: 3 }}>
           <Typography variant="h6" sx={{ mb: 1 }}>Link Distribution:</Typography>
           {(urlAnalysis.internal_links === 0 && urlAnalysis.external_links === 0) ? (
@@ -239,13 +241,13 @@ const UrlDetails: React.FC = () => {
                   data={linkChartData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={60} // Makes it a donut chart
+                  innerRadius={60}
                   outerRadius={90}
                   fill="#8884d8"
                   paddingAngle={5}
                   dataKey="value"
                   labelLine={false}
-                  label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => `${name}: ${((percent || 0 ) * 100).toFixed(0)}%`}
                 >
                   {linkChartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -258,7 +260,6 @@ const UrlDetails: React.FC = () => {
           )}
         </Box>
 
-        {/* Existing: Inaccessible Links */}
         <Box sx={{ mt: 3 }}>
           <Typography variant="h6" sx={{ mb: 1 }}>
             Inaccessible Links ({urlAnalysis.inaccessible_links.length}):
