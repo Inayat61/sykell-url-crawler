@@ -1,13 +1,14 @@
 // frontend/src/App.tsx
-import React, { useState } from 'react'; // Import useState
+import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Container, Box } from '@mui/material';
-import UrlInputForm from './components/UrlInputForm'; // Import UrlInputForm
+import UrlInputForm from './components/UrlInputForm';
+import UrlDashboard from './components/UrlDashboard'; // Import UrlDashboard
 
 function App() {
-  const [refreshTrigger, setRefreshTrigger] = useState(0); // State to trigger URL list refresh
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleUrlAdded = () => {
-    setRefreshTrigger(prev => prev + 1); // Increment to trigger re-fetch in child component
+    setRefreshTrigger(prev => prev + 1); // Increment to trigger re-fetch in dashboard
   };
 
   return (
@@ -24,13 +25,10 @@ function App() {
           Website Analysis Dashboard
         </Typography>
 
-        <UrlInputForm onUrlAdded={handleUrlAdded} /> {/* Integrate URL input form */}
+        <UrlInputForm onUrlAdded={handleUrlAdded} />
 
-        {/* Placeholder for Results Dashboard - will be a new component */}
-        {/* For now, you can pass refreshTrigger to a dummy component to see it change */}
-        <Typography variant="h5" sx={{mt: 4}}>
-          URLs List (will be here, refresh trigger: {refreshTrigger})
-        </Typography>
+        <UrlDashboard refreshTrigger={refreshTrigger} /> {/* Integrate UrlDashboard */}
+
       </Container>
     </Box>
   );
