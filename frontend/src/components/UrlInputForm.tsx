@@ -1,10 +1,9 @@
-// frontend/src/components/UrlInputForm.tsx
 import React, { useState } from 'react';
 import { TextField, Button, Box, Alert, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 interface UrlInputFormProps {
-  onUrlAdded: () => void; // Callback to refresh data after adding
+  onUrlAdded: () => void; 
 }
 
 const UrlInputForm: React.FC<UrlInputFormProps> = ({ onUrlAdded }) => {
@@ -12,23 +11,22 @@ const UrlInputForm: React.FC<UrlInputFormProps> = ({ onUrlAdded }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [lastResponseStatus, setLastResponseStatus] = useState<number | null>(null); // New state for response status
+  const [lastResponseStatus, setLastResponseStatus] = useState<number | null>(null);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
     setSuccess(null);
-    setLastResponseStatus(null); // Reset status on new submission
+    setLastResponseStatus(null); 
     setLoading(true);
 
     try {
-      // Basic URL validation
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
         setError('URL must start with http:// or https://');
         setLoading(false);
         return;
       }
-      new URL(url); // Further validation by URL constructor (throws if invalid)
+      new URL(url); 
 
       const response = await fetch('http://localhost:8080/api/urls', {
         method: 'POST',
@@ -38,23 +36,22 @@ const UrlInputForm: React.FC<UrlInputFormProps> = ({ onUrlAdded }) => {
         body: JSON.stringify({ url }),
       });
 
-      setLastResponseStatus(response.status); // Store the status
+      setLastResponseStatus(response.status); 
 
       const data = await response.json();
 
       if (!response.ok) {
         setError(data.error || 'Failed to add URL');
-        // Specific handling for 409 Conflict
         if (response.status === 409) {
             setSuccess(`URL already exists: ID ${data.id}`);
-            onUrlAdded(); // Still refresh if it existed
+            onUrlAdded(); 
         }
         return;
       }
 
       setSuccess(`URL added successfully! ID: ${data.id}`);
-      setUrl(''); // Clear input
-      onUrlAdded(); // Notify parent to refresh list
+      setUrl('');
+      onUrlAdded();
     } catch (err: any) {
       setError(err.message || 'An unknown error occurred.');
     } finally {
@@ -90,7 +87,7 @@ const UrlInputForm: React.FC<UrlInputFormProps> = ({ onUrlAdded }) => {
         variant="contained"
         startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <AddIcon />}
         disabled={loading || !url.trim()}
-        sx={{ flexShrink: 0, height: '56px' }} // Match TextField height
+        sx={{ flexShrink: 0, height: '56px' }} 
       >
         {loading ? 'Adding...' : 'Add URL'}
       </Button>
@@ -100,7 +97,7 @@ const UrlInputForm: React.FC<UrlInputFormProps> = ({ onUrlAdded }) => {
           {success}
         </Alert>
       )}
-      {error && lastResponseStatus !== 409 && ( // Use lastResponseStatus here
+      {error && lastResponseStatus !== 409 && (
         <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
           {error}
         </Alert>

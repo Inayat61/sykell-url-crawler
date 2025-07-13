@@ -1,9 +1,8 @@
-// frontend/src/components/dashboard/UrlTableRow.tsx
 import React from 'react';
 import { TableCell, TableRow, Chip, Box, Button } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import InfoIcon from '@mui/icons-material/Info';
-import { URLAnalysis, AnalysisStatus } from '../../types'; // Adjust path if needed
+import { URLAnalysis, AnalysisStatus } from '../../types'; 
 
 interface UrlTableRowProps {
   urlAnalysis: URLAnalysis;

@@ -1,4 +1,3 @@
-// frontend/src/components/dashboard/UrlAnalysisTable.tsx
 import React from 'react';
 import {
   Table,
@@ -9,8 +8,8 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
-import { URLAnalysis } from '../../types'; // Adjust path if needed
-import UrlTableRow from './UrlTableRow'; // Import the new row component
+import { URLAnalysis } from '../../types';
+import UrlTableRow from './UrlTableRow';
 
 interface UrlAnalysisTableProps {
   urls: URLAnalysis[];

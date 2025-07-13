@@ -1,11 +1,10 @@
-// frontend/src/App.tsx
 import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Container, Box } from '@mui/material';
-import { Routes, Route } from 'react-router-dom'; // <--- IMPORT Routes and Route
+import { Routes, Route } from 'react-router-dom';
 
 import UrlInputForm from './components/UrlInputForm';
 import UrlDashboard from './components/UrlDashboard';
-import UrlDetails from './components/UrlDetails'; // <--- IMPORT UrlDetails
+import UrlDetails from './components/UrlDetails'; 
 
 function App() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -24,7 +23,7 @@ function App() {
         </Toolbar>
       </AppBar>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Routes> {/* <--- ADD Routes component here */}
+        <Routes>
           <Route path="/" element={
             <>
               <Typography variant="h4" component="h1" gutterBottom>

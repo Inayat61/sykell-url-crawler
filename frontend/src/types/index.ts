@@ -1,5 +1,3 @@
-// frontend/src/types/index.ts
-
 export type AnalysisStatus = "queued" | "running" | "done" | "error";
 
 export interface HeadingCounts {
@@ -25,8 +23,8 @@ export interface URLAnalysis {
   heading_counts: HeadingCounts;
   internal_links: number;
   external_links: number;
-  inaccessible_links: BrokenLink[]; // Use array of BrokenLink
+  inaccessible_links: BrokenLink[]; 
   has_login_form: boolean;
-  created_at: string; // ISO 8601 string from Go's time.Time
-  updated_at: string; // ISO 8601 string
+  created_at: string; 
+  updated_at: string; 
 }

@@ -1,13 +1,11 @@
-// frontend/src/components/UrlDashboard.tsx
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CircularProgress, Box, Alert, Typography } from '@mui/material';
 
-// Import new sub-components
 import UrlDashboardHeader from './dashboard/UrlDashboardHeader';
 import UrlAnalysisTable from './dashboard/UrlAnalysisTable';
 
-import { URLAnalysis } from '../types'; // Adjust path if needed
+import { URLAnalysis } from '../types'; 
 
 interface UrlDashboardProps {
   refreshTrigger: number;
@@ -55,7 +53,6 @@ const UrlDashboard: React.FC<UrlDashboardProps> = ({ refreshTrigger }) => {
       if (!response.ok) {
         throw new Error(data.error || 'Failed to trigger crawl');
       }
-      // Optimistically update the status to 'running'
       setUrls(prevUrls =>
         prevUrls.map(url =>
           url.id === id ? { ...url, status: 'running', updated_at: new Date().toISOString() } : url
