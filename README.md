@@ -54,7 +54,11 @@ Once the backend server is running (`go run main.go` in the `backend` directory)
     * `curl http://localhost:8080/api/urls`
 * **`GET /api/urls/:id`**: Get details for a specific URL by its ID.
     * **Example:** `curl http://localhost:8080/api/urls/1` (replace `1` with an actual ID)
-    
+* **`POST /api/urls/:id/crawl`**: Trigger the web crawling process for a specific URL.
+    * **Example:** `curl -X POST http://localhost:8080/api/urls/1/crawl` (replace `1` with an actual URL ID)
+    * This API call returns immediately. The crawl itself runs in the background. You can use `GET /api/urls/:id` or `GET /api/urls` to check the `status` of the crawl.
+
+
 ## Features
 
 * URL management (Add, Start/Stop processing)

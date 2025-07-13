@@ -1,3 +1,4 @@
+// backend/main.go
 package main
 
 import (
@@ -6,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"sykell-url-crawler/backend/database"
-	"sykell-url-crawler/backend/handlers" 
+	"sykell-url-crawler/backend/handlers"
 )
 
 func main() {
@@ -16,6 +17,7 @@ func main() {
 
 	r := gin.Default()
 
+	// CORS middleware (as before)
 	r.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -28,21 +30,22 @@ func main() {
 		c.Next()
 	})
 
-	// --- API Routes ---
 	api := r.Group("/api")
 	{
-		api.GET("/ping", func(c *gin.Context) { 
+		api.GET("/ping", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"message": "pong",
 			})
 		})
 
 		// URL Management Endpoints
-		api.POST("/urls", handlers.AddURL)          // Add a new URL
-		api.GET("/urls", handlers.GetURLs)          // Get all URLs
-		api.GET("/urls/:id", handlers.GetURLByID)   // Get a specific URL by ID
+		api.POST("/urls", handlers.AddURL)
+		api.GET("/urls", handlers.GetURLs)
+		api.GET("/urls/:id", handlers.GetURLByID)
+
+		// New: Endpoint to trigger crawl
+		api.POST("/urls/:id/crawl", handlers.TriggerCrawl) // Use POST for actions
 	}
-	// --- End API Routes ---
 
 	port := ":8080"
 	log.Printf("Server starting on port %s", port)
