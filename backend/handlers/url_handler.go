@@ -2,6 +2,7 @@
 package handlers
 
 import (
+	"fmt" // Import fmt for Sprintf
 	"log"
 	"net/http"
 	"strconv"
@@ -143,4 +144,66 @@ func startCrawl(id int, targetURL string) {
 	if result := database.DB.Save(&urlAnalysis); result.Error != nil {
 		log.Printf("Failed to save crawl results for ID %d: %v", id, result.Error)
 	}
+}
+
+// BulkTriggerCrawlRequest represents the request body for bulk crawl.
+type BulkTriggerCrawlRequest struct {
+	IDs []int `json:"ids" binding:"required"` // List of URL IDs to crawl
+}
+
+// BulkTriggerCrawl handles the request to start crawls for multiple URL analysis entries.
+func BulkTriggerCrawl(c *gin.Context) {
+	var req BulkTriggerCrawlRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if len(req.IDs) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No IDs provided for bulk crawl"})
+		return
+	}
+
+	var updatedCount int
+	var errors []string
+
+	for _, id := range req.IDs {
+		var urlAnalysis models.URLAnalysis
+		result := database.DB.First(&urlAnalysis, id)
+		if result.Error != nil {
+			errors = append(errors, fmt.Sprintf("URL ID %d not found or database error: %v", id, result.Error))
+			continue
+		}
+
+		if urlAnalysis.Status == models.StatusRunning {
+			errors = append(errors, fmt.Sprintf("Crawl for URL ID %d is already running", id))
+			continue
+		}
+
+		// Update status to running and save
+		urlAnalysis.Status = models.StatusRunning
+		urlAnalysis.UpdatedAt = time.Now()
+		if result := database.DB.Save(&urlAnalysis); result.Error != nil {
+			errors = append(errors, fmt.Sprintf("Failed to update URL ID %d status to running: %v", id, result.Error))
+			continue
+		}
+
+		// Start the crawl in a goroutine
+		go startCrawl(urlAnalysis.ID, urlAnalysis.URL)
+		updatedCount++
+	}
+
+	if len(errors) > 0 {
+		c.JSON(http.StatusMultiStatus, gin.H{ // 207 Multi-Status if some succeeded, some failed
+			"message":       fmt.Sprintf("%d crawls triggered, with %d errors.", updatedCount, len(errors)),
+			"triggered":     updatedCount,
+			"errors_details": errors,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   fmt.Sprintf("%d crawls triggered successfully.", updatedCount),
+		"triggered": updatedCount,
+	})
 }

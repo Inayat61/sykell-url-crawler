@@ -1,4 +1,3 @@
-// backend/crawler/crawler.go
 package crawler
 
 import (
@@ -11,14 +10,14 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"sykell-url-crawler/backend/models" // Adjust import path
+	"sykell-url-crawler/backend/models"
 )
 
-// AnalyzePage fetches a URL and extracts its key information.
+
 func AnalyzePage(targetURL string) (models.URLAnalysis, error) {
 	analysis := models.URLAnalysis{
 		URL:             targetURL,
-		Status:          models.StatusError, // Default to error, update on success
+		Status:          models.StatusError, 
 		HeadingCounts:   models.HeadingCounts{},
 		InaccessibleLinks: models.BrokenLinks{},
 	}
@@ -33,7 +32,6 @@ func AnalyzePage(targetURL string) (models.URLAnalysis, error) {
 	if resp.StatusCode != http.StatusOK {
 		analysis.Status = models.StatusError
 		analysis.PageTitle = fmt.Sprintf("Error: HTTP Status %d", resp.StatusCode)
-		// Consider adding this as a broken link if it's the target URL itself
 		return analysis, fmt.Errorf("HTTP status error for %s: %d", targetURL, resp.StatusCode)
 	}
 
@@ -50,12 +48,8 @@ func AnalyzePage(targetURL string) (models.URLAnalysis, error) {
 		return analysis, fmt.Errorf("failed to parse HTML for %s: %w", targetURL, err)
 	}
 
-	// 2. Extract HTML Version (best effort, usually from doctype)
-	// This is tricky with goquery directly, often requires raw HTML inspection
-	// For simplicity, we'll make an educated guess based on common doctypes
-	// A more robust solution might involve regexp on the raw bodyBytes or a dedicated HTML parser that exposes doctype.
 	htmlVersion := "Unknown"
-	htmlString := string(bodyBytes) // Re-use the full HTML string
+	htmlString := string(bodyBytes) 
 	if strings.Contains(htmlString, `<!DOCTYPE html>`) {
 		htmlVersion = "HTML5"
 	} else if strings.Contains(htmlString, `<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"`) {
@@ -101,7 +95,7 @@ func AnalyzePage(targetURL string) (models.URLAnalysis, error) {
 	doc.Find("a[href]").Each(func(i int, s *goquery.Selection) {
 		href, exists := s.Attr("href")
 		if !exists || href == "" || href == "#" {
-			return // Skip empty or anchor-only links
+			return /
 		}
 
 		// Resolve relative URLs
@@ -126,25 +120,19 @@ func AnalyzePage(targetURL string) (models.URLAnalysis, error) {
 
 		// Check for inaccessible links (only for absolute http/https links)
 		if strings.HasPrefix(linkStr, "http://") || strings.HasPrefix(linkStr, "https://") {
-			// This is a simplified check. In a real-world crawler, you'd want a
-			// smarter queue/concurrency mechanism to avoid hammering sites
-			// and to handle redirects, timeouts more gracefully.
-			// For this task, we'll make a direct HEAD request.
-			// HEAD requests are faster as they don't download the body.
-			go func(link models.BrokenLink, actualLink string) { // Goroutine to not block the main parsing flow
+				go func(link models.BrokenLink, actualLink string) { 
 				req, err := http.NewRequest(http.MethodHead, actualLink, nil)
 				if err != nil {
 					log.Printf("Error creating HEAD request for %s: %v", actualLink, err)
 					return
 				}
-				// Add a User-Agent header to avoid being blocked by some servers
+				
 				req.Header.Set("User-Agent", "Sykell-Crawler/1.0")
 
-				client := &http.Client{Timeout: 10 * time.Second} // Short timeout for link checks
+				client := &http.Client{Timeout: 10 * time.Second} 
 				linkResp, err := client.Do(req)
 				if err != nil {
 					log.Printf("Error checking link %s: %v", actualLink, err)
-					// Treat network errors or timeouts as inaccessible
 					inaccessibleLinks = append(inaccessibleLinks, models.BrokenLink{URL: actualLink, StatusCode: 0}) // 0 for network error
 					return
 				}
@@ -153,14 +141,12 @@ func AnalyzePage(targetURL string) (models.URLAnalysis, error) {
 				if linkResp.StatusCode >= 400 {
 					inaccessibleLinks = append(inaccessibleLinks, models.BrokenLink{URL: actualLink, StatusCode: linkResp.StatusCode})
 				}
-			}(models.BrokenLink{URL: linkStr}, linkStr) // Pass linkStr to goroutine
+			}(models.BrokenLink{URL: linkStr}, linkStr) 
 		}
 	})
 
-	// Wait for a short duration to allow some goroutines to complete,
-	// This is a *very* crude way to wait. A proper solution would use
-	// a sync.WaitGroup for robust concurrency management.
-	time.Sleep(2 * time.Second) // Adjust based on expected link checks
+	
+	time.Sleep(2 * time.Second) 
 
 	analysis.InternalLinks = internalLinks
 	analysis.ExternalLinks = externalLinks
@@ -174,11 +160,11 @@ func AnalyzePage(targetURL string) (models.URLAnalysis, error) {
 			s.Find("input[name*='user'], input[name*='email'], input[name*='login']").Length() > 0 ||
 			s.Find("input[name*='pass']").Length() > 0 {
 			hasLoginForm = true
-			return // Found one, no need to check further forms
+			return 
 		}
 	})
 	analysis.HasLoginForm = hasLoginForm
 
-	analysis.Status = models.StatusDone // If we reached here, it's done successfully
+	analysis.Status = models.StatusDone
 	return analysis, nil
 }

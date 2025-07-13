@@ -1,10 +1,9 @@
-// backend/models/url_analysis.go
 package models
 
 import (
-	"database/sql/driver" // Keep this one for Valuer
-	"encoding/json"       // For JSON marshaling/unmarshaling
-	"errors"              // For error handling
+	"database/sql/driver"
+	"encoding/json"       
+	"errors"             
 	"time"
 )
 

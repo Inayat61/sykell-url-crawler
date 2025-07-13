@@ -5,10 +5,10 @@ import {
   Container,
   Typography,
   CircularProgress,
-  Box,
+  Box, // Using Box for layout as per your code
   Alert,
   Paper,
-  Grid,
+  // Grid, // Grid is not used in your current layout for individual items
   Chip,
   List,
   ListItem,
@@ -17,6 +17,9 @@ import {
   Button,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+// Import Recharts components
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 import { URLAnalysis, AnalysisStatus, HeadingCounts, BrokenLink } from '../types';
 
@@ -151,6 +154,13 @@ const UrlDetails: React.FC = () => {
     );
   };
 
+  // Data for the Pie Chart
+  const linkChartData = [
+    { name: 'Internal Links', value: urlAnalysis.internal_links },
+    { name: 'External Links', value: urlAnalysis.external_links },
+  ];
+  const COLORS = ['#0088FE', '#FFBB28']; // Colors for the pie chart slices
+
   return (
     <Container maxWidth="md">
       <Button
@@ -168,6 +178,7 @@ const UrlDetails: React.FC = () => {
         </Typography>
         <Divider sx={{ my: 2 }} />
 
+        {/* This is your existing Box-based grid layout */}
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
           <Box>
             <Typography variant="subtitle1" color="text.secondary">ID:</Typography>
@@ -210,11 +221,44 @@ const UrlDetails: React.FC = () => {
           </Box>
         </Box>
 
+        {/* Existing: Heading Counts */}
         <Box sx={{ mt: 3 }}>
           <Typography variant="h6" sx={{ mb: 1 }}>Heading Counts:</Typography>
           {renderHeadingCounts(urlAnalysis.heading_counts)}
         </Box>
 
+        {/* New: Link Distribution Chart within its own Box */}
+        <Box sx={{ mt: 3 }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>Link Distribution:</Typography>
+          {(urlAnalysis.internal_links === 0 && urlAnalysis.external_links === 0) ? (
+            <Typography variant="body2" color="text.secondary">No links found on the page.</Typography>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={linkChartData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60} // Makes it a donut chart
+                  outerRadius={90}
+                  fill="#8884d8"
+                  paddingAngle={5}
+                  dataKey="value"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
+                >
+                  {linkChartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
+        </Box>
+
+        {/* Existing: Inaccessible Links */}
         <Box sx={{ mt: 3 }}>
           <Typography variant="h6" sx={{ mb: 1 }}>
             Inaccessible Links ({urlAnalysis.inaccessible_links.length}):

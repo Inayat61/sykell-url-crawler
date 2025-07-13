@@ -1,14 +1,17 @@
 // frontend/src/App.tsx
 import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Container, Box } from '@mui/material';
+import { Routes, Route } from 'react-router-dom'; // <--- IMPORT Routes and Route
+
 import UrlInputForm from './components/UrlInputForm';
-import UrlDashboard from './components/UrlDashboard'; // Import UrlDashboard
+import UrlDashboard from './components/UrlDashboard';
+import UrlDetails from './components/UrlDetails'; // <--- IMPORT UrlDetails
 
 function App() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleUrlAdded = () => {
-    setRefreshTrigger(prev => prev + 1); // Increment to trigger re-fetch in dashboard
+    setRefreshTrigger(prev => prev + 1);
   };
 
   return (
@@ -21,14 +24,19 @@ function App() {
         </Toolbar>
       </AppBar>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Website Analysis Dashboard
-        </Typography>
-
-        <UrlInputForm onUrlAdded={handleUrlAdded} />
-
-        <UrlDashboard refreshTrigger={refreshTrigger} /> {/* Integrate UrlDashboard */}
-
+        <Routes> {/* <--- ADD Routes component here */}
+          <Route path="/" element={
+            <>
+              <Typography variant="h4" component="h1" gutterBottom>
+                Website Analysis Dashboard
+              </Typography>
+              <UrlInputForm onUrlAdded={handleUrlAdded} />
+              <UrlDashboard refreshTrigger={refreshTrigger} />
+            </>
+          } />
+          <Route path="/urls/:id" element={<UrlDetails />} /> 
+          <Route path="*" element={<Typography variant="h5" sx={{mt: 5}}>404 - Page Not Found</Typography>} /> 
+        </Routes> 
       </Container>
     </Box>
   );

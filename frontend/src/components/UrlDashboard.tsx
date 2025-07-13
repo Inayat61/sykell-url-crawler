@@ -1,5 +1,6 @@
 // frontend/src/components/UrlDashboard.tsx
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom'; // <--- IMPORT useNavigate
 import {
   Table,
   TableBody,
@@ -19,15 +20,16 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import InfoIcon from '@mui/icons-material/Info';
 
-import { URLAnalysis, AnalysisStatus } from '../types'; // Import our types
+import { URLAnalysis, AnalysisStatus } from '../types';
 
 interface UrlDashboardProps {
-  refreshTrigger: number; // Prop to trigger data refresh from parent
+  refreshTrigger: number;
 }
 
-const API_BASE_URL = 'http://localhost:8080/api'; // Define API base URL
+const API_BASE_URL = 'http://localhost:8080/api';
 
-const UrlDashboard: React.FC<UrlDashboardProps> = ({ refreshTrigger }) => { // Correct prop name
+const UrlDashboard: React.FC<UrlDashboardProps> = ({ refreshTrigger }) => {
+  const navigate = useNavigate(); // <--- INITIALIZE useNavigate
   const [urls, setUrls] = useState<URLAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,10 +53,9 @@ const UrlDashboard: React.FC<UrlDashboardProps> = ({ refreshTrigger }) => { // C
     }
   }, []);
 
-  // Effect to fetch URLs when component mounts or refreshTrigger changes
   useEffect(() => {
     fetchUrls();
-  }, [refreshTrigger, fetchUrls]); // <--- FIX IS HERE: Changed from fetchTrigger to refreshTrigger
+  }, [refreshTrigger, fetchUrls]);
 
   const handleTriggerCrawl = async (id: number) => {
     setTriggeringCrawlId(id);
@@ -80,6 +81,12 @@ const UrlDashboard: React.FC<UrlDashboardProps> = ({ refreshTrigger }) => { // C
       setTriggeringCrawlId(null);
     }
   };
+
+  // --- NEW FUNCTION TO HANDLE NAVIGATION TO DETAILS ---
+  const handleViewDetails = (id: number) => {
+    navigate(`/urls/${id}`);
+  };
+  // --- END NEW FUNCTION ---
 
   const getStatusChipColor = (status: AnalysisStatus) => {
     switch (status) {
@@ -190,8 +197,7 @@ const UrlDashboard: React.FC<UrlDashboardProps> = ({ refreshTrigger }) => { // C
                   variant="outlined"
                   size="small"
                   startIcon={<InfoIcon />}
-                  // TODO: Implement navigation to details page
-                  onClick={() => alert(`Details for ID: ${urlAnalysis.id} (Next Step!)`)}
+                  onClick={() => handleViewDetails(urlAnalysis.id)} 
                 >
                   Details
                 </Button>

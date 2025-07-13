@@ -1,4 +1,3 @@
-// backend/main.go
 package main
 
 import (
@@ -43,8 +42,11 @@ func main() {
 		api.GET("/urls", handlers.GetURLs)
 		api.GET("/urls/:id", handlers.GetURLByID)
 
-		// New: Endpoint to trigger crawl
-		api.POST("/urls/:id/crawl", handlers.TriggerCrawl) // Use POST for actions
+		// Endpoint to trigger single crawl
+		api.POST("/urls/:id/crawl", handlers.TriggerCrawl)
+
+		// New: Endpoint to trigger bulk crawl
+		api.POST("/urls/bulk-crawl", handlers.BulkTriggerCrawl)
 	}
 
 	port := ":8080"
